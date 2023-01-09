@@ -3,6 +3,7 @@ import { AccountType } from '../../interfaces/interfaces'
 import {AccountTitle} from './account_tile'
 import SearchBar from './search_bar'
 import useSWR from 'swr'
+import AddAccount from './addAccount'
 
 
 // const getData = async () => {
@@ -73,6 +74,7 @@ const TableView : FC = () =>
                         <div className="col-12">
                             <div className="form-outline">
                                 <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
+                                <AddAccount/>
 
                             {/* <label className="form-label" for="form1">Enter a task here</label> */}
                             </div>

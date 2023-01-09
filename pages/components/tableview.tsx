@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { FC, useState } from 'react'
 import { AccountType } from '../../interfaces/interfaces'
-import AccountTitle from './account_tile'
+import {AccountTitle} from './account_tile'
 import SearchBar from './search_bar'
 import useSWR from 'swr'
 
@@ -14,7 +14,7 @@ import useSWR from 'swr'
 // }
 
 
-const fetcher = async (url : string) =>
+const dataFetcher = async (url : string) =>
 {
     const res = await fetch(url)
 
@@ -24,29 +24,28 @@ const fetcher = async (url : string) =>
 }
 
 
-const TableView = () =>
+const TableView : FC = () =>
 {
     let dummyAccounts : AccountType[] = [
         {
           id: '1',
           title: 'a',
-          username: 'user',
+          user_name: 'user',
           password: 'pass'
         },
         {
           id: '2',
           title: 'b',
-          username: 'user2',
+          user_name: 'user2',
           password: 'pass2'
         },
     ]
 
-    const [searchTerm, setSearchTerm] = useState('')
+    const [searchTerm, setSearchTerm] = useState<string>('')
 
     // const { data, error } = useSWR('https://jsonplaceholder.typicode.com/posts', fetcher)
-    let { data, error } = useSWR('http://127.0.0.1:5048/api/Account/', fetcher)
+    const { data, error } = useSWR('http://127.0.0.1:5048/api/Account/', dataFetcher)
 
-    data = {data : data}
 
     if (error)
     {
@@ -58,9 +57,9 @@ const TableView = () =>
         return <div>Loading...</div>
     }
 
-    console.log(data)
-    console.log('hello')
-    console.log(error)
+    // console.log(data)
+    // console.log('hello')
+    // console.log(error)
 
     return (
         <section className="vh-100" style={{backgroundColor: "#eee"}}>
@@ -80,13 +79,7 @@ const TableView = () =>
                         </div>
                         </form>
 
-                        {/* {
-                            data.map((e:any) => {
-                                return (<p key={e.id}>{e.title}</p>)
-                            }
-                        )} */}
-
-                        {JSON.stringify(data)}
+                        {/* {JSON.stringify(data)} */}
 
                         <table className="table mb-4">
                         <thead>
@@ -100,13 +93,18 @@ const TableView = () =>
                         </thead>
                         <tbody>
                             {
-                                dummyAccounts
-                                .filter(elem => searchTerm === '' || searchTerm.toLowerCase().includes(elem.title!))
-                                .map(account =>
-                                    <AccountTitle
-                                        key={account.id}
-                                        account={account}
-                                    />
+                                data
+                                .filter((account: AccountType) => searchTerm === '' || searchTerm.toLowerCase().includes(account.title!))
+                                .map((account : AccountType) =>
+                                    {
+                                        return (<AccountTitle
+                                            key={account.id}
+                                            id={account.id}
+                                            title={account.title}
+                                            user_name={account.user_name}
+                                            password={account.password}
+                                        />)
+                                    }
                                 )
                             }
                         </tbody>

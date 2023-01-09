@@ -4,6 +4,6 @@ export interface AccountType
 {
     id?: string,
     title?: string,
-    username?: string,
+    user_name?: string,
     password?: string
 }

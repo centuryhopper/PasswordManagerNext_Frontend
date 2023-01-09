@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { FC } from 'react'
 
-const Header = (props: any) => {
+const Header : FC<{title: string}> = ({title}) : JSX.Element => {
     return (
         <>
         <header>
             <h1 className="text-center">
-                {props.title}
+                {title}
             </h1>
         </header>
         </>

@@ -1,35 +1,30 @@
-import React, { FC, useState } from 'react'
+import React, { FC, SetStateAction, useState } from 'react'
 import { AccountType } from '../../interfaces/interfaces';
+import {URL} from '../../constants/constants'
 
-export const AccountTitle : FC<AccountType> = ({id, title, user_name, password}) =>
+interface Props
+{
+    lstOfAccounts: AccountType[];
+    setLstOfAccounts: (value: SetStateAction<AccountType[]>) => void;
+    account: AccountType
+    handleDelete : (id: string) => Promise<void>
+    handleUpdate : () => Promise<void>
+}
+
+
+export const AccountTitle : FC<Props> = ({account, lstOfAccounts, setLstOfAccounts, handleDelete, handleUpdate}) =>
 {
   const [visible, setVisible] = useState<boolean>(false);
 
-  const handleDelete = (event: React.MouseEvent<HTMLButtonElement>): void =>
-  {
-    console.log('deleted account')
-
-    // confirm deletion by asking the user again
-
-    // TODO: delete request
-  }
-
-  const handleUpdate = (event: React.MouseEvent<HTMLButtonElement>): void =>
-  {
-    // TODO put request
-    console.log('updated account')
-  }
-
   return (
     <tr>
-        <th scope="row">{id}</th>
-        <td>{title}</td>
-        <td>{user_name}</td>
+        <th scope="row">{account.id}</th>
+        <td>{account.title}</td>
+        <td>{account.username}</td>
         <td className='text-wrap' style={{wordBreak: 'break-all'}}>
           <input
-            value={password}
+            value={account.password}
             type={visible ? "text" : "password"}
-            // className={styles.input_area}
             readOnly
           />
         </td>
@@ -45,7 +40,7 @@ export const AccountTitle : FC<AccountType> = ({id, title, user_name, password})
             <button
             type="submit"
             className="btn btn-danger ms-1"
-            onClick={handleDelete}
+            onClick={() => handleDelete(account.id!)}
             >
               Delete
             </button>

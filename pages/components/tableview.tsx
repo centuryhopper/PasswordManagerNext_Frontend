@@ -1,52 +1,109 @@
-import { FC, useState } from 'react'
-import { AccountType } from '../../interfaces/interfaces'
+import { FC, useRef, useState } from 'react'
+import { AccountType, dialogType} from '../../interfaces/interfaces'
 import {AccountTitle} from './account_tile'
 import SearchBar from './search_bar'
 import useSWR from 'swr'
 import AddAccount from './addAccount'
-
-
-// const getData = async () => {
-//     const res = await fetch("http://127.0.0.1:5048/api/Account/")
-
-//     const data = await res.json()
-
-//     return null
-// }
-
-
-const dataFetcher = async (url : string) =>
-{
-    const res = await fetch(url)
-
-    const data = await res.json()
-
-    return data
-}
+import { Dialog } from './Dialog'
+import {URL} from '../../constants/constants'
 
 
 const TableView : FC = () =>
 {
-    let dummyAccounts : AccountType[] = [
-        {
-          id: '1',
-          title: 'a',
-          user_name: 'user',
-          password: 'pass'
-        },
-        {
-          id: '2',
-          title: 'b',
-          user_name: 'user2',
-          password: 'pass2'
-        },
-    ]
-
     const [searchTerm, setSearchTerm] = useState<string>('')
 
-    // const { data, error } = useSWR('https://jsonplaceholder.typicode.com/posts', fetcher)
-    const { data, error } = useSWR('http://127.0.0.1:5048/api/Account/', dataFetcher)
+    const [lstOfAccounts, setLstOfAccounts] = useState<AccountType[]>([])
+    const idProductRef = useRef<string>();
 
+    const { data, error } = useSWR(URL, async (url : string) =>
+    {
+        const res = await fetch(url)
+
+        const data = await res.json()
+
+        setLstOfAccounts(JSON.parse(data))
+
+        // for (const acc of lstOfAccounts)
+        // {
+        //     console.log(acc);
+        // }
+
+        return data
+    })
+
+    const handleDelete = async (id: string): Promise<void> =>
+    {
+        console.log('deleting account from database')
+
+        // confirm deletion by asking the user again
+
+        // TODO: delete request
+
+        try {
+        const index = lstOfAccounts.findIndex((p) => p.id === id);
+
+        handleDialog("Are you sure you want to delete?", true, lstOfAccounts[index].title!)
+        idProductRef.current = id;
+
+        } catch (error : any) {
+        console.log(error.message)
+        }
+    }
+
+    const [dialog, setDialog] = useState<dialogType>({
+        message: "",
+        isLoading: false,
+        //Update
+        title: ""
+    });
+
+    const handleDialog = (message:string, isLoading:boolean, title:string) : void => {
+        setDialog({
+            message,
+            isLoading,
+            //Update
+            title
+        });
+    };
+
+    const areUSureDelete = async (choose: boolean, id: string) : Promise<void> => {
+        if (choose)
+        {
+            setLstOfAccounts(lstOfAccounts.filter((p) => p.id !== id));
+
+            try {
+                const response = await fetch(`${URL}${id}`, {method: 'DELETE'})
+
+                const result = await response.json()
+
+                console.log(result);
+            } catch (error : any) {
+                console.log(error.message)
+            }
+
+            // close dialog
+            handleDialog("", false, '');
+        }
+        else
+        {
+            // close dialog
+            handleDialog("", false, '');
+        }
+      };
+
+    const handleUpdate = async (): Promise<void> =>
+    {
+        // TODO put request
+        console.log('updated account')
+
+        const response = await fetch('')
+
+        const result = await response.json()
+
+        // grab the state of the lstOfAccounts on component mount (i.e. use useEffect(()=>{}, []))
+        // if any fields have changed, then ask the user if he/she wants to confirm the update. If so, then update the list
+        // and the database. Otherwise, revert the changes made from the current account selected
+    }
 
     if (error)
     {
@@ -57,7 +114,6 @@ const TableView : FC = () =>
     {
         return <div>Loading...</div>
     }
-
     // console.log(data)
     // console.log('hello')
     // console.log(error)
@@ -70,18 +126,13 @@ const TableView : FC = () =>
                     <div className="card rounded-3">
                     <div className="card-body p-4">
                         <h4 className="text-center my-3 pb-3">Password database query</h4>
-                        <form className="row row-cols-lg-auto g-3 justify-content-center align-items-center mb-4 pb-2">
                         <div className="col-12">
                             <div className="form-outline">
                                 <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
-                                <AddAccount/>
+                                <AddAccount lstOfAccounts={lstOfAccounts} setLstOfAccounts={setLstOfAccounts}/>
 
-                            {/* <label className="form-label" for="form1">Enter a task here</label> */}
                             </div>
                         </div>
-                        </form>
-
-                        {/* {JSON.stringify(data)} */}
 
                         <table className="table mb-4">
                         <thead>
@@ -95,22 +146,31 @@ const TableView : FC = () =>
                         </thead>
                         <tbody>
                             {
-                                data
+                                lstOfAccounts
                                 .filter((account: AccountType) => searchTerm === '' || searchTerm.toLowerCase().includes(account.title!))
                                 .map((account : AccountType) =>
                                     {
                                         return (<AccountTitle
                                             key={account.id}
-                                            id={account.id}
-                                            title={account.title}
-                                            user_name={account.user_name}
-                                            password={account.password}
+                                            account={account}
+                                            lstOfAccounts={lstOfAccounts}
+                                            setLstOfAccounts={setLstOfAccounts}
+                                            handleDelete={handleDelete}
+                                            handleUpdate={handleUpdate}
                                         />)
                                     }
                                 )
                             }
                         </tbody>
                         </table>
+                        <Dialog
+                            id={idProductRef.current!}
+                            title={dialog.title}
+                            onDialog={areUSureDelete}
+                            message={dialog.message}
+                            dialog={dialog}
+                            handleDialog={handleDialog}
+                        />
                     </div>
                     </div>
                 </div>
@@ -121,3 +181,4 @@ const TableView : FC = () =>
 }
 
 export default TableView
+

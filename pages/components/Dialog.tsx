@@ -6,16 +6,16 @@ interface Props
 {
     message: string,
     onDialog: (choose: boolean, id: string) => Promise<void>,
-    handleDialog: (message:string, isLoading:boolean, title:string) => void,
+    handleDialog: (message: string, isLoading: boolean, title: string) => void,
     dialog: dialogType,
     title: string,
     id: string
 }
 
-export const Dialog : FC<Props> = ({message, onDialog, title, id, handleDialog, dialog}) : JSX.Element => {
-
+export const Dialog : FC<Props> = ({message, onDialog, title, id, handleDialog, dialog}) : JSX.Element =>
+{
     return (
-      <div>
+      <>
         <Modal show={dialog.isLoading} onHide={() => handleDialog('', false, '')}>
           <Modal.Header closeButton>
             <Modal.Title>{title}</Modal.Title>
@@ -32,6 +32,6 @@ export const Dialog : FC<Props> = ({message, onDialog, title, id, handleDialog, 
             </Button>
           </Modal.Footer>
         </Modal>
-      </div>
+      </>
     );
 }

@@ -7,8 +7,8 @@ interface Props
     lstOfAccounts: AccountType[];
     setLstOfAccounts: (value: SetStateAction<AccountType[]>) => void;
     account: AccountType
-    handleDelete : (id: string) => Promise<void>
-    handleUpdate : () => Promise<void>
+    handleDelete : (id: string) => void
+    handleUpdate : (id: string) => void
 }
 
 
@@ -48,7 +48,7 @@ export const AccountTitle : FC<Props> = ({account, lstOfAccounts, setLstOfAccoun
             <button
             type="submit"
             className="btn btn-success"
-            onClick={handleUpdate}
+            onClick={() => handleUpdate(account.id!)}
             >
               Update
             </button>

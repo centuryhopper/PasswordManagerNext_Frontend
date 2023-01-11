@@ -1,11 +1,12 @@
 import { FC, useRef, useState } from 'react'
-import { AccountType, dialogType} from '../../interfaces/interfaces'
+import { AccountType, dialogType, updateDialogType} from '../../interfaces/interfaces'
 import {AccountTitle} from './account_tile'
 import SearchBar from './search_bar'
 import useSWR from 'swr'
 import AddAccount from './addAccount'
 import { Dialog } from './Dialog'
 import {URL} from '../../constants/constants'
+import { UpdateDialog } from './UpdateDialog'
 
 
 const TableView : FC = () =>
@@ -14,6 +15,7 @@ const TableView : FC = () =>
 
     const [lstOfAccounts, setLstOfAccounts] = useState<AccountType[]>([])
     const idProductRef = useRef<string>();
+    const accountRef = useRef<AccountType>();
 
     const { data, error } = useSWR(URL, async (url : string) =>
     {
@@ -31,40 +33,39 @@ const TableView : FC = () =>
         return data
     })
 
-    const handleDelete = async (id: string): Promise<void> =>
+    const [deleteDialog, setDeleteDialog] = useState<dialogType>({
+        message: "",
+        isLoading: false,
+        title: ""
+    })
+
+    const [updateDialog, setUpdateDialog] = useState<updateDialogType>({
+        message: "",
+        isLoading: false,
+        account: {id: '', title: '', username: '', password: ''}
+    })
+
+    const handleDelete = (id: string): void =>
     {
         console.log('deleting account from database')
 
         // confirm deletion by asking the user again
 
-        // TODO: delete request
-
-        try {
         const index = lstOfAccounts.findIndex((p) => p.id === id);
 
-        handleDialog("Are you sure you want to delete?", true, lstOfAccounts[index].title!)
-        idProductRef.current = id;
+        handleDeleteDialog("Are you sure you want to delete?", true, lstOfAccounts[index].title!)
 
-        } catch (error : any) {
-        console.log(error.message)
-        }
+        idProductRef.current = id;
     }
 
-    const [dialog, setDialog] = useState<dialogType>({
-        message: "",
-        isLoading: false,
-        //Update
-        title: ""
-    });
-
-    const handleDialog = (message:string, isLoading:boolean, title:string) : void => {
-        setDialog({
+    const handleDeleteDialog = (message:string, isLoading:boolean, title:string) : void => {
+        setDeleteDialog({
             message,
             isLoading,
             //Update
             title
-        });
-    };
+        })
+    }
 
     const areUSureDelete = async (choose: boolean, id: string) : Promise<void> => {
         if (choose)
@@ -82,27 +83,75 @@ const TableView : FC = () =>
             }
 
             // close dialog
-            handleDialog("", false, '');
+            handleDeleteDialog("", false, '');
         }
         else
         {
             // close dialog
-            handleDialog("", false, '');
+            handleDeleteDialog("", false, '');
         }
-      };
+    }
 
-    const handleUpdate = async (): Promise<void> =>
+    const handleUpdate = (id: string): void =>
     {
-        // TODO put request
+        // put request
         console.log('updated account')
 
-        const response = await fetch('')
+        const index = lstOfAccounts.findIndex((p) => p.id === id);
 
-        const result = await response.json()
+        handleUpdateDialog("Are you sure you want to update?", true, lstOfAccounts[index]!)
+
+        accountRef.current = lstOfAccounts[index]
 
         // grab the state of the lstOfAccounts on component mount (i.e. use useEffect(()=>{}, []))
         // if any fields have changed, then ask the user if he/she wants to confirm the update. If so, then update the list
         // and the database. Otherwise, revert the changes made from the current account selected
+    }
+
+    const areUSureUpdate = async (choose: boolean, updatedAccount: AccountType) : Promise<void> => {
+        if (choose)
+        {
+            // find existing account by id
+            const index = lstOfAccounts.findIndex((p) => p.id === updatedAccount.id);
+
+            // replace its values with that of the updatedAccount
+            setLstOfAccounts((prevLst : AccountType[]) => {
+                prevLst[index].title = updatedAccount.title
+                prevLst[index].username = updatedAccount.username
+                prevLst[index].password = updatedAccount.password
+                return prevLst
+            })
+
+            try {
+                const response = await fetch(URL,  {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedAccount)
+                })
+                const result = await response.json()
+
+                console.log(result);
+            } catch (error : any) {
+                console.log(error.message)
+            }
+
+            // close dialog
+            handleUpdateDialog("", false, {});
+        }
+        else
+        {
+            // close dialog
+            handleUpdateDialog("", false, {});
+        }
+    }
+
+    const handleUpdateDialog = (message: string, isLoading: boolean, account: AccountType) : void => {
+        setUpdateDialog({
+            message,
+            isLoading,
+            //Update
+            account
+        })
     }
 
     if (error)
@@ -114,6 +163,7 @@ const TableView : FC = () =>
     {
         return <div>Loading...</div>
     }
+
     // console.log(data)
     // console.log('hello')
     // console.log(error)
@@ -165,11 +215,18 @@ const TableView : FC = () =>
                         </table>
                         <Dialog
                             id={idProductRef.current!}
-                            title={dialog.title}
+                            title={deleteDialog.title}
                             onDialog={areUSureDelete}
-                            message={dialog.message}
-                            dialog={dialog}
-                            handleDialog={handleDialog}
+                            message={deleteDialog.message}
+                            dialog={deleteDialog}
+                            handleDialog={handleDeleteDialog}
+                        />
+
+                        <UpdateDialog
+                            onDialog={areUSureUpdate}
+                            dialog={updateDialog}
+                            handleDialog={handleUpdateDialog}
+                            account={accountRef.current!}
                         />
                     </div>
                     </div>

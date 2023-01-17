@@ -1,6 +1,5 @@
 import React, { FC, SetStateAction, useState } from 'react'
 import { AccountType } from '../../interfaces/interfaces';
-import {URL} from '../../constants/constants'
 
 interface Props
 {

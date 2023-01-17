@@ -180,10 +180,8 @@ const TableView : FC = () =>
                             <div className="form-outline">
                                 <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm}/>
                                 <AddAccount lstOfAccounts={lstOfAccounts} setLstOfAccounts={setLstOfAccounts}/>
-
                             </div>
                         </div>
-
                         <table className="table mb-4">
                         <thead>
                             <tr>

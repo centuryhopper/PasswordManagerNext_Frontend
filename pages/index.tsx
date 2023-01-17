@@ -5,6 +5,8 @@ import styles from '../styles/Home.module.css'
 import Header from './components/header'
 import TableView from './components/tableview'
 import { NextPage } from 'next'
+import { LoginForm } from './components/LoginForm'
+import { RegisterForm } from './components/RegisterForm'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,9 +16,11 @@ const Home : NextPage = () => {
       <Head>
           <title>Password Manager</title>
           <meta name="description" content="Home page" />
-        </Head>
+      </Head>
       <Header title="Password Manager"/>
-      <TableView />
+      {/* <TableView /> */}
+      <LoginForm/>
+      {/* <RegisterForm/> */}
     </div>
   )
 }

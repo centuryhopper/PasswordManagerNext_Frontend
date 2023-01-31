@@ -18,8 +18,8 @@ const Home : NextPage = () => {
           <meta name="description" content="Home page" />
       </Head>
       <Header title="Password Manager"/>
-      {/* <TableView /> */}
-      <LoginForm/>
+      <TableView />
+      {/* <LoginForm/> */}
       {/* <RegisterForm/> */}
     </div>
   )

@@ -172,7 +172,7 @@ const TableView : FC = () =>
         <section className="vh-100" style={{backgroundColor: "#eee"}}>
             <div className="container py-5 h-100">
                 <div className="row d-flex justify-content-center align-items-center h-100">
-                <div className="col col-lg-9 col-xl-7">
+                <div className="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
                     <div className="card rounded-3">
                     <div className="card-body p-4">
                         <h4 className="text-center my-3 pb-3">Password database query</h4>
@@ -182,35 +182,39 @@ const TableView : FC = () =>
                                 <AddAccount lstOfAccounts={lstOfAccounts} setLstOfAccounts={setLstOfAccounts}/>
                             </div>
                         </div>
-                        <table className="table mb-4">
-                        <thead>
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">Title</th>
-                                <th scope="col">Username</th>
-                                <th scope="col">Password</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                lstOfAccounts
-                                .filter((account: AccountType) => searchTerm === '' || searchTerm.toLowerCase().includes(account.title!))
-                                .map((account : AccountType) =>
-                                    {
-                                        return (<AccountTitle
-                                            key={account.id}
-                                            account={account}
-                                            lstOfAccounts={lstOfAccounts}
-                                            setLstOfAccounts={setLstOfAccounts}
-                                            handleDelete={handleDelete}
-                                            handleUpdate={handleUpdate}
-                                        />)
-                                    }
-                                )
-                            }
-                        </tbody>
-                        </table>
+
+                        <div className="table-responsive">
+                            <table className="table mb-4">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Password</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    lstOfAccounts
+                                    .filter((account: AccountType) => searchTerm === '' || searchTerm.toLowerCase().includes(account.title!))
+                                    .map((account : AccountType) =>
+                                        {
+                                            return (<AccountTitle
+                                                key={account.id}
+                                                account={account}
+                                                lstOfAccounts={lstOfAccounts}
+                                                setLstOfAccounts={setLstOfAccounts}
+                                                handleDelete={handleDelete}
+                                                handleUpdate={handleUpdate}
+                                            />)
+                                        }
+                                    )
+                                }
+                            </tbody>
+                            </table>
+                        </div>
+
                         <Dialog
                             id={idProductRef.current!}
                             title={deleteDialog.title}
